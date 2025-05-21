@@ -14,24 +14,30 @@ const createDeveloper = asyncHandler(async (req, res) => {
 });
 
 // GET ALL DEVELOPERS
-const getAllDevelopers = asyncHandler(async(req,res)=>{
-    const developers = await Developers.find();
-    
-    if (!developers) {
+const getAllDevelopers = asyncHandler(async (req, res) => {
+  const developers = await Developers.find();
+
+  if (!developers) {
     res.status(404).json({ msg: "No developers found" }, 404);
   }
 
-  res.status(200).json({data:developers, msg:"Developers found successfully", status:200});
+  res.status(200).json({data: developers, msg: "Developers found successfully", status: 200 });
 });
 
 // GET A USER BY ID
-const getUserById = asyncHandler(async(req,res)=>{
-    const {id:developerid} = req.params;
-    const developer = await Developers.findById({_id:developerid}, req.body);
-    if(!developer){
-        res.status(404).json({msg:"Developer not found", status:404});
-    }
-    res.status(200).json({data:developer, msg:"Developer found successfully", status:200})
+const getUserById = asyncHandler(async (req, res) => {
+  const { id: developerid } = req.params;
+  const developer = await Developers.findById({ _id: developerid }, req.body);
+  if (!developer) {
+    res.status(404).json({ msg: "Developer not found", status: 404 });
+  }
+  res
+    .status(200)
+    .json({
+      data: developer,
+      msg: "Developer found successfully",
+      status: 200,
+    });
 });
 
 // UPDATE USER BY ID
