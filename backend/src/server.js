@@ -1,10 +1,18 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from 'cors';
 import connectDB from "./connect/db.js";
 const server = express();
 dotenv.config();
 
 const port = process.env.PORT;
+
+server.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  // allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
 server.use(express.json());
 
