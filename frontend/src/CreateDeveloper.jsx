@@ -23,42 +23,46 @@ function CreateDeveloper() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage("");
-    setError("");
+  e.preventDefault();
+  setMessage("");
+  setError("");
 
-    try {
-      const response = await fetch("http://localhost:7447/api/v1/developer/createdeveloper", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          skills: formData.skills.split(",").map((skill) => skill.trim()),
-        }),
-      });
+  try {
+    const response = await fetch("http://localhost:7447/api/v1/developer/createdeveloper", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...formData,
+        skills: formData.skills
+          .split(",")
+          .map((skill) => skill.trim())
+          .filter((skill) => skill),
+      }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.msg || "Failed to create developer");
-      }
-
-      setMessage("Developer created successfully!");
-      setFormData({
-        name: "",
-        email: "",
-        yearOfExperience: 0,
-        title: "",
-        skills: "",
-        developer: "",
-        country: "",
-      });
-    } catch (err) {
-      setError(err.message);
+    if (!response.ok) {
+      throw new Error(data.msg || "Failed to create developer");
     }
-  };
+
+    setMessage("Developer created successfully!");
+    setFormData({
+      name: "",
+      email: "",
+      yearOfExperience: 0,
+      title: "",
+      skills: "",
+      developer: "",
+      country: "",
+    });
+  } catch (err) {
+    console.error("Error creating developer:", err);
+    setError(err.message);
+  }
+};
 
   return (
     <div style={styles.container}>

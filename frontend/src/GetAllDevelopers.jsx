@@ -5,22 +5,24 @@ function GetAllDevelopers() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    setIsLoading(true);
-    fetch("http://localhost:7447/api/v1/developer/getAlldevelopers")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch developers");
-        return res.json();
-      })
-      .then((data) => {
+   useEffect(() => {
+    const fetchDevelopers = async () => {
+      try {
+        const response = await fetch('http://localhost:7447/api/v1/developer/getAlldevelopers');
+        if (!response.ok) {
+          throw new Error('Failed to fetch developers');
+        }
+        const data = await response.json();
         setUsers(data.data || []);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching users:", err);
+      } catch (err) {
+        console.error('Error fetching users:', err);
         setError(err.message);
+      } finally {
         setIsLoading(false);
-      });
+      }
+    };
+
+    fetchDevelopers();
   }, []);
 
   if (isLoading) {
