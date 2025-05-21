@@ -3,7 +3,7 @@ import Developers from "../models/developer.model.js";
 
 // CREATE DEVELOPER
 const createDeveloper = asyncHandler(async (req, res) => {
-  const { name, email, yearOfExperience, title, developer, country } = req.body;
+  const { name, email, yearOfExperience, title, skills, developer, country } = req.body;
   const newDeveloper = await Developers.create(req.body);
 
   if (!newDeveloper) {

@@ -20,6 +20,10 @@ const developersSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    skills: {
+      type: [String],
+      required: true,
+    },
     developer: {
       type: String,
       required: true,
