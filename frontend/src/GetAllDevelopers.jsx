@@ -1,127 +1,132 @@
-// import React from 'react'
-
-// const GetAllDevelopers = () => {
-//   return (
-//     <div>GetAllDevelopers</div>
-//   )
-// }
-
-// export default GetAllDevelopers
-
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function GetAllDevelopers() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    yearOfExperience: 0,
-    title: "",
-    skills: "",
-    developer: "",
-    country: "",
-  });
+  const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "yearOfExperience" ? Number(value) : value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage("");
-    setError("");
-
-    try {
-      const response = await fetch("http://localhost:7447/api/v1/developer/createdeveloper", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          skills: formData.skills.split(",").map((skill) => skill.trim()),
-        }),
+  useEffect(() => {
+    setIsLoading(true);
+    fetch("http://localhost:7447/api/v1/developer/getAlldevelopers")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch developers");
+        return res.json();
+      })
+      .then((data) => {
+        setUsers(data.data || []);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching users:", err);
+        setError(err.message);
+        setIsLoading(false);
       });
+  }, []);
 
-      const data = await response.json();
+  if (isLoading) {
+    return <div style={styles.message}>🚀 Loading developers...</div>;
+  }
 
-      if (!response.ok) {
-        throw new Error(data.msg || "Failed to create developer");
-      }
+  if (error) {
+    return <div style={{ ...styles.message, color: "#e63946" }}>❌ Error: {error}</div>;
+  }
 
-      setMessage("Developer created successfully!");
-      setFormData({
-        name: "",
-        email: "",
-        yearOfExperience: 0,
-        title: "",
-        skills: "",
-        developer: "",
-        country: "",
-      });
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  if (!users.length) {
+    return <div style={styles.message}>👨‍💻 No developers found.</div>;
+  }
 
   return (
     <div style={styles.container}>
-      <h1>Create Developer</h1>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
-        <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-        <input type="number" name="yearOfExperience" placeholder="Experience (Years)" value={formData.yearOfExperience} onChange={handleChange} required />
-        <input type="text" name="title" placeholder="Title" value={formData.title} onChange={handleChange} required />
-        <input type="text" name="skills" placeholder="Skills (comma-separated)" value={formData.skills} onChange={handleChange} required />
-        <input type="text" name="developer" placeholder="Developer Role" value={formData.developer} onChange={handleChange} required />
-        <input type="text" name="country" placeholder="Country" value={formData.country} onChange={handleChange} required />
-        <button type="submit" style={styles.button}>Create</button>
-      </form>
-      {message && <p style={styles.success}>{message}</p>}
-      {error && <p style={styles.error}>{error}</p>}
+      <h1 style={styles.header}>💡 Developer Profiles</h1>
+      <div style={styles.grid}>
+        {users.map((user) => (
+          <div key={user._id} style={styles.card}>
+            <h2 style={styles.name}>{user.name}</h2>
+            <p><strong>Email:</strong> {user.email}</p>
+            <p><strong>Title:</strong> {user.title}</p>
+            <p><strong>Experience:</strong> {user.yearOfExperience} {user.yearOfExperience > 1 ? 'years' : 'year'}</p>
+            <p><strong>Role:</strong> {user.developer}</p>
+            <p><strong>Country:</strong> {user.country}</p>
+            <div>
+              <p style={styles.skillsTitle}>Skills:</p>
+              <div style={styles.skillTags}>
+                {user.skills.map((skill, index) => (
+                  <span key={index} style={styles.skillItem}>{skill}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
 const styles = {
   container: {
-    maxWidth: '500px',
-    margin: '40px auto',
-    padding: '20px',
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '40px 20px',
     fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
-    backgroundColor: '#fff',
-    borderRadius: '10px',
-    boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
+    background: 'linear-gradient(to right, #f8f9fa, #e0f7fa)',
+    minHeight: '100vh',
   },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px',
+  header: {
+    textAlign: 'center',
+    fontSize: '36px',
+    fontWeight: 'bold',
+    color: '#2b2d42',
+    marginBottom: '40px',
   },
-  button: {
-    padding: '10px',
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
+  message: {
+    textAlign: 'center',
+    fontSize: '20px',
+    color: '#555',
+    marginTop: '50px',
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+    gap: '25px',
+  },
+  card: {
+    background: 'linear-gradient(135deg, #ffffff, #f0f8ff)',
+    borderRadius: '16px',
+    padding: '25px',
+    border: '1px solid #ccc',
+    boxShadow: '0 6px 14px rgba(0, 0, 0, 0.1)',
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
     cursor: 'pointer',
+    hover: {
+      transform: 'scale(1.05)',
+    }
   },
-  success: {
-    marginTop: '20px',
-    color: 'green',
-    fontWeight: 'bold',
+  name: {
+    fontSize: '24px',
+    fontWeight: '700',
+    color: '#1e293b',
+    marginBottom: '12px',
   },
-  error: {
-    marginTop: '20px',
-    color: 'red',
-    fontWeight: 'bold',
+  skillsTitle: {
+    marginTop: '15px',
+    fontWeight: '600',
+    color: '#333',
+    fontSize: '16px',
+  },
+  skillTags: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '10px',
+    marginTop: '8px',
+  },
+  skillItem: {
+    backgroundColor: '#00bcd4',
+    color: '#fff',
+    padding: '6px 12px',
+    borderRadius: '20px',
+    fontSize: '13px',
+    fontWeight: '500',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
   },
 };
 

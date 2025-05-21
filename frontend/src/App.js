@@ -4,8 +4,8 @@ import GetAllDevelopers from "./GetAllDevelopers";
 function App() {
   return (
     <div>
-      <GetAllDevelopers />
      <CreateDeveloper />
+     <GetAllDevelopers />
     </div>
   )
 };
